@@ -42,6 +42,4 @@ public class ItemController {
     public Collection<ItemDto> search(@RequestParam(name = "text") String text) {
         return itemService.search(text);
     }
-
-    // выводит анавелибл предметы в поиске
 }

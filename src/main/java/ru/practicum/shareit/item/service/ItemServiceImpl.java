@@ -18,7 +18,6 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
 
-    // Привет! Когда делала назрел вопрос: где лучше использовать маппер, сразу в контроллере, в сервисе или в репозитории? Я сделала в сервисе, потому что это как бы "перевалочный пункт" между пользователем и программой, но как лучше?
     @Override
     public ItemDto addItem(ItemDto itemDto, Long ownerId) {
         isOwnerExists(ownerId);

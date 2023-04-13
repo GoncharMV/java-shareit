@@ -1,9 +1,9 @@
 package ru.practicum.shareit.user.repository;
 
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.validation.ObjectNotFoundException;
-import ru.practicum.shareit.validation.ValidateException;
+import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.exception.ObjectNotFoundException;
+import ru.practicum.shareit.exception.ValidateException;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -56,10 +56,6 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public void delete(Long id) {
         userStorage.remove(id);
-    }
-
-    private Long generateId() {
-        return (long) userStorage.size() + 1;
     }
 
     private boolean isEmailExists(String newEmail) {

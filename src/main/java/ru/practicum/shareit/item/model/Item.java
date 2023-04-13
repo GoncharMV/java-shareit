@@ -1,24 +1,27 @@
 package ru.practicum.shareit.item.model;
 
-
-import lombok.Generated;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.practicum.shareit.request.ItemRequest;
 
-import javax.validation.constraints.NotNull;
-
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Item {
-    @Generated
     private Long id;
-    @NotNull
     private String name;
-    @NotNull
     private String description;
-    private boolean available;
+    private Boolean available;
     private Long owner;
     private ItemRequest request;
 
+    public Item(Long id, String name, String description, Boolean available) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.available = available;
+    }
 }

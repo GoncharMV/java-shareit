@@ -6,7 +6,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
-import java.util.List;
+import java.util.Collection;
 
 @RestController
 @RequestMapping("/items")
@@ -18,26 +18,30 @@ public class ItemController {
     @PostMapping
     public ItemDto add(@RequestHeader(name = "X-Sharer-User-Id") Long ownerId,
             @Valid @RequestBody ItemDto item) {
-        return itemService.add();
+        return itemService.addItem(item, ownerId);
     }
 
-    @PatchMapping
-    public ItemDto edit(@Valid @RequestBody ItemDto item) {
-        return itemService.edit();
+    @PatchMapping("/{itemId}")
+    public ItemDto edit(@RequestHeader(name = "X-Sharer-User-Id") Long ownerId,
+                        @RequestBody ItemDto item,
+                        @PathVariable Long itemId) {
+        return itemService.editItem(item, ownerId, itemId);
     }
 
     @GetMapping("/{itemId}")
     public ItemDto get(@PathVariable Long itemId) {
-        return itemService.get(itemId);
+        return itemService.getItem(itemId);
     }
 
     @GetMapping
-    public List<ItemDto> getOwnerItems(Long ownerId) {
+    public Collection<ItemDto> getOwnerItems(@RequestHeader(name = "X-Sharer-User-Id") Long ownerId) {
         return itemService.getOwnerItems(ownerId);
     }
 
-/*    @GetMapping
-    public void search() {
+    @GetMapping("/search")
+    public Collection<ItemDto> search(@RequestParam(name = "text") String text) {
+        return itemService.search(text);
+    }
 
-    }*/
+    // выводит анавелибл предметы в поиске
 }

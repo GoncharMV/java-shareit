@@ -20,6 +20,7 @@ import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -98,7 +99,7 @@ public class BookingServiceImpl implements BookingService {
                 });
 
         Item item = booking.getItem();
-        if (booking.getBooker().getUserId() != userId && item.getOwner().getUserId() != userId) {
+        if (!Objects.equals(booking.getBooker().getUserId(), userId) && !Objects.equals(item.getOwner().getUserId(), userId)) {
             throw new ObjectNotFoundException("Нет доступа для просмотра бронирования");
         }
 

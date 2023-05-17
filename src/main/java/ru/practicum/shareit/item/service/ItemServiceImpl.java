@@ -71,7 +71,8 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto getItem(Long itemId, Long userId) {
-        Item item = itemRepository.findById(itemId).orElseThrow(() -> new ObjectNotFoundException("Предмет не найден"));
+        Item item = itemRepository.findById(itemId).orElseThrow(()
+                -> new ObjectNotFoundException("Предмет не найден"));
         ItemDto itemDto = ItemMapper.toItemDto(item);
 
         itemDto.setComments(commentRepository.findAll());
@@ -118,28 +119,38 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public CommentDto postComment(Long userId, CommentDto commentDto, Long itemId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new ObjectNotFoundException("Пользователь не найден"));
-        Item item = itemRepository.findById(itemId).orElseThrow(() -> new ObjectNotFoundException("Предмет не найден"));
         commentDto.setCreated(LocalDateTime.now());
         List<Booking> bookings = bookingRepository.getAllByBookerUserIdAndItem_ItemIdAndStatusAndEndIsBefore(
                 userId,
                 itemId,
                 BookingStatus.APPROVED,
                 commentDto.getCreated());
-
         if (bookings.isEmpty()) {
             throw new BookingException("Комментарий может оставлять пользователь, который бронировал вещь");
         }
+
+        User user = userRepository.findById(userId).orElseThrow(()
+                -> new ObjectNotFoundException("Пользователь не найден"));
+        Item item = itemRepository.findById(itemId).orElseThrow(()
+                -> new ObjectNotFoundException("Предмет не найден"));
 
         Comment comment = commentRepository.save(ItemMapper.toComment(commentDto, user, item));
         return ItemMapper.toCommentDto(comment);
     }
 
     public Booking getLastBooking(Long itemId) {
-        return bookingRepository.getFirstByItemItemIdAndStatusAndStartIsBeforeOrderByStartDesc(itemId, BookingStatus.APPROVED, LocalDateTime.now());
+        return bookingRepository.getFirstByItemItemIdAndStatusAndStartIsBeforeOrderByStartDesc(
+                itemId,
+                BookingStatus.APPROVED,
+                LocalDateTime.now()
+        );
     }
 
     public Booking getNextBooking(Long itemId) {
-        return bookingRepository.getFirstByItemItemIdAndStatusAndStartIsAfterOrderByStartAsc(itemId, BookingStatus.APPROVED, LocalDateTime.now());
+        return bookingRepository.getFirstByItemItemIdAndStatusAndStartIsAfterOrderByStartAsc(
+                itemId,
+                BookingStatus.APPROVED,
+                LocalDateTime.now()
+        );
     }
 }

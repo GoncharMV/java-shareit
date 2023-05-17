@@ -7,8 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.BookingStatus;
-import ru.practicum.shareit.booking.dto.BookingInputDto;
-import ru.practicum.shareit.booking.dto.BookingOutputDto;
+import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.BookingException;
@@ -33,24 +32,20 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional
-    public BookingOutputDto addBooking(BookingInputDto bookingInputDto, Long userId) {
+    public BookingDto addBooking(BookingDto bookingDto, Long userId) {
 
-        User user = userRepository.findById(userId).orElseThrow(() -> {
-            throw new ObjectNotFoundException("Пользователь не найден");
-        });
-
-        Item item = itemRepository.findById(bookingInputDto.getItemId()).orElseThrow(() -> {
+        Item item = itemRepository.findById(bookingDto.getItemId()).orElseThrow(() -> {
             throw new ObjectNotFoundException("Предмет не найден");
         });
 
         if (!item.getAvailable()) {
             throw new BookingException("Предмет недоступен для бронирования");
         }
-        if (bookingInputDto.getStart().equals(bookingInputDto.getEnd())) {
+        if (bookingDto.getStart().equals(bookingDto.getEnd())) {
             throw new BookingException("Конец бронирования не должен равняться началу бронирования");
         }
 
-        if (bookingInputDto.getEnd().isBefore(bookingInputDto.getStart())) {
+        if (bookingDto.getEnd().isBefore(bookingDto.getStart())) {
             throw new BookingException("Конец бронирования не может быть раньше начала бронирования");
         }
 
@@ -58,18 +53,21 @@ public class BookingServiceImpl implements BookingService {
             throw new ObjectNotFoundException("Невозможно забронировать свою вещь");
         }
 
-        Booking booking = bookingRepository.save(BookingMapper.toBooking(bookingInputDto,
+        User user = userRepository.findById(userId).orElseThrow(() -> {
+            throw new ObjectNotFoundException("Пользователь не найден");
+        });
+        Booking booking = bookingRepository.save(BookingMapper.toBooking(bookingDto,
                                                     item,
                                                     user,
                                                     BookingStatus.WAITING
                                                     )
         );
-        return BookingMapper.toOutputDto(booking);
+        return BookingMapper.toBookingDto(booking);
     }
 
     @Override
     @Transactional
-    public BookingOutputDto updateStatus(Long bookingId, Long ownerId, boolean approved) {
+    public BookingDto updateStatus(Long bookingId, Long ownerId, boolean approved) {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> {
             throw new BookingException("Бронирование не найдено");
         });
@@ -86,11 +84,11 @@ public class BookingServiceImpl implements BookingService {
             booking.setStatus(BookingStatus.REJECTED);
         }
 
-        return BookingMapper.toOutputDto(booking);
+        return BookingMapper.toBookingDto(booking);
     }
 
     @Override
-    public BookingOutputDto getBooking(Long bookingId, Long userId) {
+    public BookingDto getBooking(Long bookingId, Long userId) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new ObjectNotFoundException("Пользователь не найден"));
 
@@ -99,15 +97,16 @@ public class BookingServiceImpl implements BookingService {
                 });
 
         Item item = booking.getItem();
-        if (!Objects.equals(booking.getBooker().getUserId(), userId) && !Objects.equals(item.getOwner().getUserId(), userId)) {
+        if (!Objects.equals(booking.getBooker().getUserId(), userId)
+                && !Objects.equals(item.getOwner().getUserId(), userId)) {
             throw new ObjectNotFoundException("Нет доступа для просмотра бронирования");
         }
 
-        return BookingMapper.toOutputDto(booking);
+        return BookingMapper.toBookingDto(booking);
     }
 
     @Override
-    public List<BookingOutputDto> getBookersBooking(Long bookerId, String state) {
+    public List<BookingDto> getBookersBooking(Long bookerId, String state) {
         userRepository.findById(bookerId)
                 .orElseThrow(() -> new ObjectNotFoundException("Пользователь не найден"));
 
@@ -115,7 +114,8 @@ public class BookingServiceImpl implements BookingService {
 
         switch (state) {
             case "ALL":
-                return BookingMapper.toBookingDtoList(bookingRepository.findAllByBookerUserIdOrderByStartDesc(bookerId));
+                return BookingMapper.toBookingDtoList(bookingRepository
+                        .findAllByBookerUserIdOrderByStartDesc(bookerId));
             case "CURRENT":
                 bookings = bookingRepository.findByBookerCurrent(bookerId, LocalDateTime.now());
                 return BookingMapper.toBookingDtoList(bookings);
@@ -136,7 +136,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingOutputDto> getOwnersBooking(Long ownerId, String state) {
+    public List<BookingDto> getOwnersBooking(Long ownerId, String state) {
 
         userRepository.findById(ownerId)
                 .orElseThrow(() -> new ObjectNotFoundException("Пользователь не найден"));
@@ -145,7 +145,8 @@ public class BookingServiceImpl implements BookingService {
 
         switch (state) {
             case "ALL":
-                return BookingMapper.toBookingDtoList(bookingRepository.findByItemOwnerUserIdOrderByStartDesc(ownerId));
+                return BookingMapper.toBookingDtoList(bookingRepository
+                        .findByItemOwnerUserIdOrderByStartDesc(ownerId));
             case "CURRENT":
                 bookings = bookingRepository.findByItemOwnerCurrent(ownerId, LocalDateTime.now());
                 return BookingMapper.toBookingDtoList(bookings);

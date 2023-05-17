@@ -8,9 +8,12 @@ import ru.practicum.shareit.user.model.User;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BookingMapper {
+public final class BookingMapper {
 
-    public static Booking toBooking(BookingInputDto bookingDto, Item item, User user, BookingStatus status) {
+    private BookingMapper() {
+    }
+
+    public static Booking toBooking(BookingDto bookingDto, Item item, User user, BookingStatus status) {
         return  new Booking(
                 bookingDto.getId(),
                 bookingDto.getStart(),
@@ -21,21 +24,21 @@ public class BookingMapper {
         );
     }
 
-    public static List<BookingOutputDto> toBookingDtoList(List<Booking> bookings) {
-        List<BookingOutputDto> bookingDtos = new ArrayList<>();
+    public static List<BookingDto> toBookingDtoList(List<Booking> bookings) {
+        List<BookingDto> bookingDtos = new ArrayList<>();
         for (Booking b : bookings) {
-            bookingDtos.add(toOutputDto(b));
+            bookingDtos.add(toBookingDto(b));
         }
         return bookingDtos;
     }
 
-    public static BookingOutputDto toOutputDto(Booking booking) {
-        return new BookingOutputDto(booking.getBookingId(),
+    public static BookingDto toBookingDto(Booking booking) {
+        return new BookingDto(booking.getBookingId(),
                 booking.getStart(),
                 booking.getEnd(),
+                booking.getStatus().toString(),
                 toBookingItemDto(booking.getItem()),
-                toBookerDto(booking.getBooker()),
-                booking.getStatus().toString()
+                toBookerDto(booking.getBooker())
                 );
     }
 

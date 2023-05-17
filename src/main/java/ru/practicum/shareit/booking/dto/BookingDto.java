@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BookingInputDto {
+public class BookingDto {
 
     private Long id;
     @FutureOrPresent(message = "Дата начала не должна быть в прошлом")
@@ -23,4 +23,17 @@ public class BookingInputDto {
     private LocalDateTime end;
     @NotNull(message = "Необходим id объекта для брони")
     private Long itemId;
+    private String status;
+    private BookingItemDto item;
+    private BookerDto booker;
+
+    public BookingDto(Long id, LocalDateTime start, LocalDateTime end,
+                      String status, BookingItemDto item, BookerDto booker) {
+        this.id = id;
+        this.start = start;
+        this.end = end;
+        this.status = status;
+        this.item = item;
+        this.booker = booker;
+    }
 }

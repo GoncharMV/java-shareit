@@ -7,7 +7,7 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
-import java.util.Collection;
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "/users")
@@ -18,13 +18,13 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public Collection<UserDto> getAll() {
+    public List<UserDto> getAll() {
         return userService.getAll();
     }
 
     @GetMapping("/{userId}")
     public UserDto getUser(@PathVariable Long userId) {
-        return userService.get(userId);
+        return UserMapper.toUserDto(userService.get(userId));
     }
 
     @PostMapping

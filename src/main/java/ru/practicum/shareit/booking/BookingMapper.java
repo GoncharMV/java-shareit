@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking;
 import ru.practicum.shareit.booking.dto.*;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.dto.UserShortDto;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.ArrayList;
@@ -14,14 +15,25 @@ public final class BookingMapper {
     }
 
     public static Booking toBooking(BookingDto bookingDto, Item item, User user, BookingStatus status) {
-        return  new Booking(
-                bookingDto.getId(),
-                bookingDto.getStart(),
-                bookingDto.getEnd(),
-                item,
-                user,
-                status
-        );
+        return Booking.builder()
+                .bookingId(bookingDto.getId())
+                .start(bookingDto.getStart())
+                .end(bookingDto.getEnd())
+                .item(item)
+                .booker(user)
+                .status(status)
+                .build();
+    }
+
+    public static BookingDto toBookingDto(Booking booking) {
+        return BookingDto.builder()
+                .id(booking.getBookingId())
+                .start(booking.getStart())
+                .end(booking.getEnd())
+                .status(booking.getStatus().toString())
+                .item(toBookingItemDto(booking.getItem()))
+                .booker(toUserShortDto(booking.getBooker()))
+                .build();
     }
 
     public static List<BookingDto> toBookingDtoList(List<Booking> bookings) {
@@ -30,20 +42,6 @@ public final class BookingMapper {
             bookingDtos.add(toBookingDto(b));
         }
         return bookingDtos;
-    }
-
-    public static BookingDto toBookingDto(Booking booking) {
-        return new BookingDto(booking.getBookingId(),
-                booking.getStart(),
-                booking.getEnd(),
-                booking.getStatus().toString(),
-                toBookingItemDto(booking.getItem()),
-                toBookerDto(booking.getBooker())
-                );
-    }
-
-    public static BookerDto toBookerDto(User user) {
-        return new BookerDto(user.getUserId());
     }
 
     public static BookingItemDto toBookingItemDto(Item item) {
@@ -60,5 +58,9 @@ public final class BookingMapper {
             }
             return bookingDto;
 
+    }
+
+    public static UserShortDto toUserShortDto(User user) {
+        return new UserShortDto(user.getUserId());
     }
 }

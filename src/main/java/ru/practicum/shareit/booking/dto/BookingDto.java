@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.dto;
 
 import lombok.*;
+import ru.practicum.shareit.user.dto.UserShortDto;
 
 import javax.validation.constraints.Future;
 import javax.validation.constraints.FutureOrPresent;
@@ -25,10 +26,10 @@ public class BookingDto {
     private Long itemId;
     private String status;
     private BookingItemDto item;
-    private BookerDto booker;
+    private UserShortDto booker;
 
     public BookingDto(Long id, LocalDateTime start, LocalDateTime end,
-                      String status, BookingItemDto item, BookerDto booker) {
+                      String status, BookingItemDto item, UserShortDto booker) {
         this.id = id;
         this.start = start;
         this.end = end;

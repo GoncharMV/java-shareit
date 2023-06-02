@@ -267,4 +267,65 @@ class BookingServiceTest {
         assertThrows(ObjectNotFoundException.class,
                 () -> bookingService.getBookersBooking(99L, BookingState.ALL, 0, 20));
     }
+
+    @Test
+    @DisplayName("Тест получения всех бронирований владельца")
+    void getAllOwnerBookingTest() {
+        BookingDto currentBooking = BookingDto.builder()
+                .id(2L)
+                .itemId(item.getId())
+                .start(testTime.minusMinutes(10))
+                .end(testTime.plusMinutes(10))
+                .build();
+
+        BookingDto pastBooking = BookingDto.builder()
+                .id(3L)
+                .itemId(item.getId())
+                .start(testTime.minusMinutes(100))
+                .end(testTime.minusMinutes(50))
+                .build();
+
+        BookingDto futureBooking = BookingDto.builder()
+                .id(4L)
+                .itemId(item.getId())
+                .start(testTime.plusMinutes(10))
+                .end(testTime.plusMinutes(50))
+                .build();
+
+        BookingDto rejectedBooking = BookingDto.builder()
+                .id(5L)
+                .itemId(item.getId())
+                .start(testTime.plusMinutes(10))
+                .end(testTime.plusMinutes(50))
+                .build();
+
+        bookingService.addBooking(bookingDto, booker.getId());
+        bookingService.addBooking(currentBooking, booker.getId());
+        bookingService.addBooking(pastBooking, booker.getId());
+        bookingService.addBooking(futureBooking, booker.getId());
+        bookingService.addBooking(rejectedBooking, booker.getId());
+
+        bookingService.updateStatus(rejectedBooking.getId(), owner.getId(), false);
+
+        List<BookingDto> bookings = bookingService.getOwnersBooking(owner.getId(),
+                BookingState.ALL, 0, 20);
+        assertEquals(5, bookings.size());
+
+        List<BookingDto> currentBookings = bookingService.getOwnersBooking(owner.getId(),
+                BookingState.CURRENT, 0, 20);
+        assertEquals(1, currentBookings.size());
+
+        List<BookingDto> pastBookings = bookingService.getOwnersBooking(owner.getId(),
+                BookingState.PAST, 0, 20);
+        assertEquals(1, pastBookings.size());
+
+        List<BookingDto> futureBookings = bookingService.getOwnersBooking(owner.getId(),
+                BookingState.FUTURE, 0, 20);
+        assertEquals(3, futureBookings.size());
+
+        List<BookingDto> rejectedBokings = bookingService.getOwnersBooking(owner.getId(),
+                BookingState.REJECTED, 0, 20);
+        assertEquals(1, rejectedBokings.size());
+    }
+
 }

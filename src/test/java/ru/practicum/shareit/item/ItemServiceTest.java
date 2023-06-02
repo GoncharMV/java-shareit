@@ -8,12 +8,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
+import org.yaml.snakeyaml.events.Event;
+import ru.practicum.shareit.booking.BookingMapper;
+import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.exception.BookingException;
 import ru.practicum.shareit.exception.ObjectNotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
+
+import java.time.LocalDateTime;
+import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -28,6 +39,8 @@ public class ItemServiceTest {
     private final UserService userService;
     @Autowired
     private final ItemService itemService;
+    @Autowired
+    private final BookingService bookingService;
 
     private final UserDto owner = UserDto.builder()
             .id(1L)
@@ -57,7 +70,9 @@ public class ItemServiceTest {
 
     private ItemDto initItem;
 
-    private final ItemDto itemUpdateAvailable = ItemDto.builder()
+    private final ItemDto itemUpdate = ItemDto.builder()
+            .name("new Name")
+            .description("even cooler description")
             .available(false)
             .build();
 
@@ -89,9 +104,11 @@ public class ItemServiceTest {
     @Test
     @DisplayName("Тест редактирования item")
     void editItemTest() {
-        ItemDto newItem = itemService.editItem(itemUpdateAvailable, owner.getId(), initItem.getId());
+        ItemDto newItem = itemService.editItem(itemUpdate, owner.getId(), initItem.getId());
 
         assertEquals(initItem.getId(), newItem.getId());
+        assertEquals(itemUpdate.getName(), newItem.getName());
+        assertEquals(itemUpdate.getDescription(), newItem.getDescription());
         assertEquals(false, newItem.getAvailable());
     }
 
@@ -99,7 +116,85 @@ public class ItemServiceTest {
     @DisplayName("Тест попытка редактирования не владельцом")
     void editItemWrongUserTest() {
         assertThrows(ValidationException.class,
-                () -> itemService.editItem(itemUpdateAvailable, wrongUser.getId(), initItem.getId()));
+                () -> itemService.editItem(itemUpdate, wrongUser.getId(), initItem.getId()));
     }
+
+    @Test
+    @DisplayName("Тест получение item по ID")
+    void getItemTest() {
+        ItemDto itemAdded = itemService.addItem(item, owner.getId());
+        ItemDto itemGet = itemService.getItem(itemAdded.getId(), owner.getId());
+        assertEquals(itemAdded.getId(), itemGet.getId());
+        assertEquals(itemAdded.getName(), itemGet.getName());
+    }
+
+    @Test
+    @DisplayName("Тест попытка получения несуществующего объекта")
+    void getItemWrongIdTest() {
+        assertThrows(ObjectNotFoundException.class,
+                () -> itemService.getItem(99L, owner.getId()));
+    }
+
+    @Test
+    @DisplayName("Тест получения всех предметов пользователя")
+    void getOwnerItemsTest() {
+        itemService.addItem(item, owner.getId());
+        itemService.addItem(item1, owner.getId());
+
+        Collection<ItemDto> items = itemService.getOwnerItems(owner.getId());
+
+        assertEquals(2, items.size());
+    }
+
+    @Test
+    @DisplayName("Тест поиска предметов")
+    void searchTest() {
+        itemService.addItem(item, owner.getId());
+        itemService.addItem(item1, owner.getId());
+
+        Collection<ItemDto> items = itemService.search(item.getName());
+        assertEquals(item.getName(), items.iterator().next().getName());
+        assertEquals(1, items.size());
+    }
+
+    @Test
+    @DisplayName("Тест попытка оставить комментарий без бронирования ")
+    void postCommentWrongUserTest() {
+        ItemDto itemDto = itemService.addItem(item, owner.getId());
+
+        CommentDto commentForItem = CommentDto.builder()
+                .text("Оч крутой трайкойдер")
+                .build();
+
+        assertThrows(BookingException.class,
+                () -> itemService.postComment(wrongUser.getId(), commentForItem, itemDto.getId()));
+    }
+
+    @Test
+    @DisplayName("Тест пост комментария")
+    void postCommentTest() {
+        LocalDateTime testTime = LocalDateTime.now();
+        ItemDto itemDto = itemService.addItem(item, owner.getId());
+
+        BookingDto bookingDto = BookingDto.builder()
+                .id(1L)
+                .itemId(itemDto.getId())
+                .start(testTime.minusMinutes(10))
+                .end(testTime.minusMinutes(1))
+                .build();
+
+        BookingDto booking = bookingService.addBooking(bookingDto, wrongUser.getId());
+        bookingService.updateStatus(booking.getId(), owner.getId(), true);
+
+
+        CommentDto commentForItem = CommentDto.builder()
+                .text("Оч крутой трайкойдер")
+                .build();
+        CommentDto comment = itemService.postComment(booking.getBooker().getId(), commentForItem, itemDto.getId());
+
+        assertEquals(commentForItem.getText(), comment.getText());
+
+    }
+
 
 }

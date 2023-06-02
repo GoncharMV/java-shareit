@@ -44,6 +44,7 @@ public class UserServiceTest {
 
     private final UserDto userUpdate = UserDto.builder()
             .name("updated")
+            .email("updated@mail.ru")
             .build();
 
     @Autowired
@@ -71,7 +72,7 @@ public class UserServiceTest {
         userService.edit(userUpdate, 1L);
 
         assertEquals("updated", userService.get(1L).getName());
-        assertEquals("one@mail.ru", userService.get(1L).getEmail());
+        assertEquals("updated@mail.ru", userService.get(1L).getEmail());
 
         assertThrows(ObjectNotFoundException.class,
                 () -> userService.edit(userUpdate, 99L));
@@ -94,6 +95,8 @@ public class UserServiceTest {
 
         assertEquals("one", user.getName());
         assertEquals("one@mail.ru", user.getEmail());
+        assertThrows(ObjectNotFoundException.class,
+                () -> userService.get(99L));
     }
 
     @Test

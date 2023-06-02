@@ -1,6 +1,7 @@
 package ru.practicum.shareit.request;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -18,8 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -58,6 +58,7 @@ class RequestControllerTest {
     private final ItemRequest request = RequestMapper.toItemRequest(requestDto, UserMapper.toUser(requestor));
 
     @Test
+    @DisplayName("Тест добавление запроса")
     void addRequestTest() throws Exception {
         when(requestService.addRequest(any(), anyLong()))
                 .thenReturn(requestDto);
@@ -75,37 +76,69 @@ class RequestControllerTest {
     }
 
     @Test
+    @DisplayName("Тест получение всех запросов пользователя")
     void getAllByRequestorTest() throws Exception {
-        ItemRequestDto itemRequest1 = ItemRequestDto.builder()
+        ItemRequestDto request1 = ItemRequestDto.builder()
                 .requestorId(UserMapper.toUser(requestor).getUserId())
                 .description("1")
                 .id(1L).build();
-        ItemRequestDto itemRequest2 = ItemRequestDto.builder()
+        ItemRequestDto request2 = ItemRequestDto.builder()
                 .requestorId(UserMapper.toUser(requestor).getUserId())
                 .description("2")
                 .id(2L).build();
         when(requestService.getUserRequests(anyLong()))
-                .thenReturn(List.of(itemRequest1, itemRequest2));
+                .thenReturn(List.of(request1, request2));
 
         mvc.perform(get("/requests")
                         .header(header, requestor.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].id",
-                        is(itemRequest1.getId()), Long.class))
+                        is(request1.getId()), Long.class))
                 .andExpect(jsonPath("$.[0].description",
-                        is(itemRequest1.getDescription())))
+                        is(request1.getDescription())))
                 .andExpect(jsonPath("$.[0].requestorId",
-                        is(itemRequest1.getRequestorId()), Long.class))
+                        is(request1.getRequestorId()), Long.class))
                 .andExpect(jsonPath("$.[1].id",
-                        is(itemRequest2.getId()), Long.class))
+                        is(request2.getId()), Long.class))
                 .andExpect(jsonPath("$.[1].description",
-                        is(itemRequest2.getDescription())))
+                        is(request2.getDescription())))
                 .andExpect(jsonPath("$.[1].requestorId",
-                        is(itemRequest2.getRequestorId()), Long.class));
+                        is(request2.getRequestorId()), Long.class));
 
     }
 
     @Test
+    @DisplayName("Тест получения всех запросов")
+    void getAllRequestsTest() throws Exception {
+        ItemRequestDto request1 = ItemRequestDto.builder()
+                .requestorId(UserMapper.toUser(requestor).getUserId())
+                .description("1")
+                .id(1L).build();
+        ItemRequestDto request2 = ItemRequestDto.builder()
+                .requestorId(UserMapper.toUser(requestor).getUserId())
+                .description("2")
+                .id(2L).build();
+
+        when(requestService.getAllRequests(anyInt(), anyInt(), anyLong()))
+                .thenReturn(List.of(request1, request2));
+
+        mvc.perform(get("/requests/all")
+                        .header(header, requestor.getId())
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].id", is(request1.getId()), Long.class))
+                .andExpect(jsonPath("$.[0].description", is(request1.getDescription())))
+                .andExpect(jsonPath("$.[0].requestorId", is(request1.getRequestorId()), Long.class))
+                .andExpect(jsonPath("$.[1].id", is(request2.getId()), Long.class))
+                .andExpect(jsonPath("$.[1].description", is(request2.getDescription())))
+                .andExpect(jsonPath("$.[1].requestorId", is(request2.getRequestorId()), Long.class));
+    }
+
+
+    @Test
+    @DisplayName("Тест получение запроса по ID")
     void getByRequestIdTest() throws Exception {
         when(requestService.getRequestById(anyLong(), anyLong()))
                 .thenReturn(requestDto);

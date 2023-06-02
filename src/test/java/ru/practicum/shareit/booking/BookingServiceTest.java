@@ -17,6 +17,7 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import javax.transaction.Transactional;
+import java.awt.print.Book;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -125,11 +126,32 @@ class BookingServiceTest {
     }
 
     @Test
-    @DisplayName("Тест поменять статус бронирования")
-    void updateStatusTest() {
+    @DisplayName("Тест попытка забронировать недоступную вещь")
+    void addBookingUnavailable() {
+        BookingDto unavailableBooking = BookingDto.builder()
+                .id(2L)
+                .itemId(itemNotAvailable.getId())
+                .start(testTime.plusSeconds(1))
+                .end(testTime.plusSeconds(10))
+                .build();
+        assertThrows(BookingException.class,
+                () -> bookingService.addBooking(unavailableBooking, booker.getId()));
+    }
+
+    @Test
+    @DisplayName("Тест поменять статус бронирования APPROVED")
+    void updateStatusApprovedTest() {
         BookingDto booking = bookingService.addBooking(bookingDto, booker.getId());
         BookingDto bookingApproved = bookingService.updateStatus(booking.getId(), owner.getId(), true);
         assertEquals(BookingStatus.APPROVED, bookingApproved.getStatus());
+    }
+
+    @Test
+    @DisplayName("Тест поменять статус бронирования REJECTED")
+    void updateStatusRejectedTest() {
+        BookingDto booking = bookingService.addBooking(bookingDto, booker.getId());
+        BookingDto bookingApproved = bookingService.updateStatus(booking.getId(), owner.getId(), false);
+        assertEquals(BookingStatus.REJECTED, bookingApproved.getStatus());
     }
 
     @Test
@@ -177,5 +199,11 @@ class BookingServiceTest {
 
         assertThrows(ObjectNotFoundException.class,
                 () -> bookingService.getBooking(bookingDto.getId(), someUser.getId()));
+    }
+
+    @Test
+    void getBookersBookingWrongUserTest() {
+        assertThrows(ObjectNotFoundException.class,
+                () -> bookingService.getBookersBooking(99L, "ALL", 0, 20));
     }
 }

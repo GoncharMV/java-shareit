@@ -136,13 +136,12 @@ public class BookingServiceImpl implements BookingService {
             case REJECTED:
                 bookings = bookingRepository.findByBookerAndStatus(bookerId, BookingStatus.REJECTED, pageable);
                 return BookingMapper.toBookingDtoList(bookings);
-            default: throw new BookingException("Unknown state: " + state);
+            default: throw new BookingException("Unknown state: UNSUPPORTED_STATUS");
         }
     }
 
     @Override
     public List<BookingDto> getOwnersBooking(Long ownerId, BookingState state, int from, int size) {
-
         userRepository.findById(ownerId)
                 .orElseThrow(() -> new ObjectNotFoundException("Пользователь не найден"));
 
@@ -169,7 +168,7 @@ public class BookingServiceImpl implements BookingService {
             case REJECTED:
                 bookings = bookingRepository.findByItemOwnerAndStatus(ownerId, BookingStatus.REJECTED, pageable);
                 return BookingMapper.toBookingDtoList(bookings);
-            default: throw new BookingException("Unknown state: " + state);
+            default: throw new BookingException("Unknown state: UNSUPPORTED_STATUS");
         }
     }
 }

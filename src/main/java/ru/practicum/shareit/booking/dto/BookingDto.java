@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.dto;
 
 import lombok.*;
+import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.user.dto.UserShortDto;
 
 import javax.validation.constraints.Future;
@@ -24,17 +25,7 @@ public class BookingDto {
     private LocalDateTime end;
     @NotNull(message = "Необходим id объекта для брони")
     private Long itemId;
-    private String status;
+    private BookingStatus status;
     private BookingItemDto item;
     private UserShortDto booker;
-
-    public BookingDto(Long id, LocalDateTime start, LocalDateTime end,
-                      String status, BookingItemDto item, UserShortDto booker) {
-        this.id = id;
-        this.start = start;
-        this.end = end;
-        this.status = status;
-        this.item = item;
-        this.booker = booker;
-    }
 }

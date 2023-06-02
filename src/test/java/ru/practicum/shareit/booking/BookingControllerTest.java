@@ -22,6 +22,7 @@ import ru.practicum.shareit.user.model.User;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.*;
@@ -36,7 +37,7 @@ class BookingControllerTest {
 
     private final String header = "X-Sharer-User-Id";
 
-    private final ItemDto item = ItemDto.builder()
+    private final ItemDto itemDto = ItemDto.builder()
             .id(1L)
             .name("Pants")
             .description("Those pants you wanted altered are ready to be picked up.")
@@ -68,7 +69,7 @@ class BookingControllerTest {
         testTime = LocalDateTime.now();
         bookingDto = BookingDto.builder()
                 .id(1L)
-                .itemId(item.getId())
+                .itemId(itemDto.getId())
                 .start(testTime.plusSeconds(1))
                 .end(testTime.plusSeconds(12))
                 .build();
@@ -78,7 +79,7 @@ class BookingControllerTest {
     @DisplayName("Тест добавления бронирования")
     void addTest() throws Exception {
         User user = UserMapper.toUser(booker);
-        Item item = ItemMapper.toItem(this.item, user);
+        Item item = ItemMapper.toItem(this.itemDto, user);
         Booking booking = BookingMapper.toBooking(bookingDto, item, user, BookingStatus.WAITING);
         when(bookingService.addBooking(any(), anyLong()))
                 .thenReturn(BookingMapper.toBookingDto(booking));
@@ -98,7 +99,7 @@ class BookingControllerTest {
     @DisplayName("Тест изменения статуса бронирования")
     void updateStatusTest() throws Exception {
         User user = UserMapper.toUser(booker);
-        Item item = ItemMapper.toItem(this.item, user);
+        Item item = ItemMapper.toItem(this.itemDto, user);
         Booking booking = BookingMapper.toBooking(bookingDto, item, user, BookingStatus.WAITING);
         booking.setStatus(BookingStatus.APPROVED);
         when(bookingService.updateStatus(anyLong(), anyLong(), anyBoolean()))
@@ -120,7 +121,7 @@ class BookingControllerTest {
     @DisplayName("Тест получения информации по бронирования")
     void getTest() throws Exception {
         User user = UserMapper.toUser(booker);
-        Item item = ItemMapper.toItem(this.item, user);
+        Item item = ItemMapper.toItem(this.itemDto, user);
         Booking booking = BookingMapper.toBooking(bookingDto, item, user, BookingStatus.WAITING);
         when(bookingService.getBooking(anyLong(), anyLong()))
                 .thenReturn(BookingMapper.toBookingDto(booking));
@@ -131,4 +132,19 @@ class BookingControllerTest {
                 .andExpect(jsonPath("$.id", is(booking.getBookingId()), Long.class))
                 .andExpect(jsonPath("$.status", is(booking.getStatus().toString())));
     }
+
+    @Test
+    @DisplayName("Тест получения бронирований заказчиком")
+    void getBookersBookingTest() throws Exception {
+        when(bookingService.getBookersBooking(anyLong(), any(), anyInt(), anyInt()))
+                .thenReturn(List.of(bookingDto));
+
+        mvc.perform(get("/bookings")
+                        .param("state", "ALL")
+                        .header(header, booker.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].id", is(bookingDto.getId()), Long.class))
+                .andExpect(jsonPath("$.[0].status", is(bookingDto.getStatus())));
+    }
+
 }

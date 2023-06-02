@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.PageableUtil;
 import ru.practicum.shareit.booking.BookingMapper;
+import ru.practicum.shareit.booking.BookingState;
 import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
@@ -108,7 +109,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getBookersBooking(Long bookerId, String state, int from, int size) {
+    public List<BookingDto> getBookersBooking(Long bookerId, BookingState state, int from, int size) {
         userRepository.findById(bookerId)
                 .orElseThrow(() -> new ObjectNotFoundException("Пользователь не найден"));
 
@@ -117,22 +118,22 @@ public class BookingServiceImpl implements BookingService {
         Pageable pageable = PageableUtil.pageManager(from, size, "start");
 
         switch (state) {
-            case "ALL":
+            case ALL:
                 return BookingMapper.toBookingDtoList(bookingRepository
                         .findAllByBookerUserIdOrderByStartDesc(bookerId, pageable));
-            case "CURRENT":
+            case CURRENT:
                 bookings = bookingRepository.findByBookerCurrent(bookerId, LocalDateTime.now(), pageable);
                 return BookingMapper.toBookingDtoList(bookings);
-            case "PAST":
+            case PAST:
                 bookings = bookingRepository.findByBookerPast(bookerId, LocalDateTime.now(), pageable);
                 return BookingMapper.toBookingDtoList(bookings);
-            case "FUTURE":
+            case FUTURE:
                 bookings = bookingRepository.findByBookerFuture(bookerId, LocalDateTime.now(), pageable);
                 return BookingMapper.toBookingDtoList(bookings);
-            case "WAITING":
+            case WAITING:
                 bookings = bookingRepository.findByBookerAndStatus(bookerId, BookingStatus.WAITING, pageable);
                 return BookingMapper.toBookingDtoList(bookings);
-            case "REJECTED":
+            case REJECTED:
                 bookings = bookingRepository.findByBookerAndStatus(bookerId, BookingStatus.REJECTED, pageable);
                 return BookingMapper.toBookingDtoList(bookings);
             default: throw new BookingException("Unknown state: " + state);
@@ -140,7 +141,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getOwnersBooking(Long ownerId, String state, int from, int size) {
+    public List<BookingDto> getOwnersBooking(Long ownerId, BookingState state, int from, int size) {
 
         userRepository.findById(ownerId)
                 .orElseThrow(() -> new ObjectNotFoundException("Пользователь не найден"));
@@ -150,22 +151,22 @@ public class BookingServiceImpl implements BookingService {
         Pageable pageable = PageableUtil.pageManager(from, size, "start");
 
         switch (state) {
-            case "ALL":
+            case ALL:
                 return BookingMapper.toBookingDtoList(bookingRepository
                         .findByItemOwnerUserIdOrderByStartDesc(ownerId, pageable));
-            case "CURRENT":
+            case CURRENT:
                 bookings = bookingRepository.findByItemOwnerCurrent(ownerId, LocalDateTime.now(), pageable);
                 return BookingMapper.toBookingDtoList(bookings);
-            case "PAST":
+            case PAST:
                 bookings = bookingRepository.findByItemOwnerPast(ownerId, LocalDateTime.now(), pageable);
                 return BookingMapper.toBookingDtoList(bookings);
-            case "FUTURE":
+            case FUTURE:
                 bookings = bookingRepository.findByItemOwnerFuture(ownerId, LocalDateTime.now(), pageable);
                 return BookingMapper.toBookingDtoList(bookings);
-            case "WAITING":
+            case WAITING:
                 bookings = bookingRepository.findByItemOwnerAndStatus(ownerId, BookingStatus.WAITING, pageable);
                 return BookingMapper.toBookingDtoList(bookings);
-            case "REJECTED":
+            case REJECTED:
                 bookings = bookingRepository.findByItemOwnerAndStatus(ownerId, BookingStatus.REJECTED, pageable);
                 return BookingMapper.toBookingDtoList(bookings);
             default: throw new BookingException("Unknown state: " + state);

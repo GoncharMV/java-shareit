@@ -154,6 +154,15 @@ public class ItemServiceTest {
     }
 
     @Test
+    void searchBlankTextTest() {
+        itemService.addItem(item, owner.getId());
+        itemService.addItem(item1, owner.getId());
+
+        Collection<ItemDto> items = itemService.search("");
+        assertEquals(0, items.size());
+    }
+
+    @Test
     @DisplayName("Тест попытка оставить комментарий без бронирования ")
     void postCommentWrongUserTest() {
         ItemDto itemDto = itemService.addItem(item, owner.getId());

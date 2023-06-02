@@ -18,6 +18,7 @@ import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -201,8 +202,69 @@ class BookingServiceTest {
     }
 
     @Test
+    @DisplayName("Тест получения всех бронирований, которые совершил пользователь")
+    void getAllBookersBookingTest() {
+        BookingDto currentBooking = BookingDto.builder()
+                .id(2L)
+                .itemId(item.getId())
+                .start(testTime.minusMinutes(10))
+                .end(testTime.plusMinutes(10))
+                .build();
+
+        BookingDto pastBooking = BookingDto.builder()
+                .id(3L)
+                .itemId(item.getId())
+                .start(testTime.minusMinutes(100))
+                .end(testTime.minusMinutes(50))
+                .build();
+
+        BookingDto futureBooking = BookingDto.builder()
+                .id(4L)
+                .itemId(item.getId())
+                .start(testTime.plusMinutes(10))
+                .end(testTime.plusMinutes(50))
+                .build();
+
+        BookingDto rejectedBooking = BookingDto.builder()
+                .id(5L)
+                .itemId(item.getId())
+                .start(testTime.plusMinutes(10))
+                .end(testTime.plusMinutes(50))
+                .build();
+
+        bookingService.addBooking(bookingDto, booker.getId());
+        bookingService.addBooking(currentBooking, booker.getId());
+        bookingService.addBooking(pastBooking, booker.getId());
+        bookingService.addBooking(futureBooking, booker.getId());
+        bookingService.addBooking(rejectedBooking, booker.getId());
+
+        bookingService.updateStatus(rejectedBooking.getId(), owner.getId(), false);
+
+        List<BookingDto> bookings = bookingService.getBookersBooking(booker.getId(),
+                BookingState.ALL, 0, 20);
+        assertEquals(5, bookings.size());
+
+        List<BookingDto> currentBookings = bookingService.getBookersBooking(booker.getId(),
+                BookingState.CURRENT, 0, 20);
+        assertEquals(1, currentBookings.size());
+
+        List<BookingDto> pastBookings = bookingService.getBookersBooking(booker.getId(),
+                BookingState.PAST, 0, 20);
+        assertEquals(1, pastBookings.size());
+
+        List<BookingDto> futureBookings = bookingService.getBookersBooking(booker.getId(),
+                BookingState.FUTURE, 0, 20);
+        assertEquals(3, futureBookings.size());
+
+        List<BookingDto> rejectedBokings = bookingService.getBookersBooking(booker.getId(),
+                BookingState.REJECTED, 0, 20);
+        assertEquals(1, rejectedBokings.size());
+    }
+
+    @Test
     void getBookersBookingWrongUserTest() {
+        bookingService.addBooking(bookingDto, booker.getId());
         assertThrows(ObjectNotFoundException.class,
-                () -> bookingService.getBookersBooking(99L, "ALL", 0, 20));
+                () -> bookingService.getBookersBooking(99L, BookingState.ALL, 0, 20));
     }
 }

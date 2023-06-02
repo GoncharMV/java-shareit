@@ -1,6 +1,6 @@
 package ru.practicum.shareit.item;
 
-import org.junit.jupiter.api.BeforeEach;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,10 +9,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.service.UserService;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -33,8 +33,9 @@ public class ItemControllerTest {
 
     @MockBean
     private ItemService itemService;
-    @MockBean
-    private UserService userService;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     @Autowired
     private MockMvc mvc;
@@ -52,19 +53,14 @@ public class ItemControllerTest {
             .available(true)
             .build();
 
-    private final ItemDto itemUpdate = ItemDto.builder()
-            .name("new Name")
-            .description("even cooler description")
-            .available(false)
+    ItemDto item2 = ItemDto.builder()
+            .id(2L)
+            .name("Triname")
+            .description("desc2")
             .build();
 
-    @BeforeEach
-    void setUp() {
-        itemService.addItem(item, owner.getId());
-        userService.create(owner);
-    }
-
     @Test
+    @DisplayName("Тест получения item по ID")
     void getItemTest() throws Exception {
         when(itemService.getItem(anyLong(), anyLong()))
                 .thenReturn(item);
@@ -80,13 +76,7 @@ public class ItemControllerTest {
     @Test
     @DisplayName("Тест получения всех items пользователя")
     void getOwnerItemsTest() throws Exception {
-        ItemDto item2 = ItemDto.builder()
-                .id(2L)
-                .name("name")
-                .description("desc2")
-                .build();
-
-        when(itemService.getOwnerItems(anyLong()))
+                when(itemService.getOwnerItems(anyLong()))
                 .thenReturn(List.of(item, item2));
 
         mvc.perform(get("/items")
@@ -103,4 +93,42 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.[1].description", is(item2.getDescription())));
     }
 
+    @Test
+    @DisplayName("Тест поиска вещей")
+    void searchTest() throws Exception {
+        when(itemService.search(anyString()))
+                .thenReturn(List.of(item, item2));
+
+        mvc.perform(get("/items/search")
+                        .header(header, owner.getId())
+                        .param("text", "Tri"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].id", is(item.getId()), Long.class))
+                .andExpect(jsonPath("$.[0].name", is(item.getName())))
+                .andExpect(jsonPath("$.[0].description", is(item.getDescription())))
+                .andExpect(jsonPath("$.[1].id", is(item2.getId()), Long.class))
+                .andExpect(jsonPath("$.[1].name", is(item2.getName())))
+                .andExpect(jsonPath("$.[1].description", is(item2.getDescription())));
+    }
+
+    @Test
+    @DisplayName("Тест добавление комментария")
+    void postCommentTest() throws Exception {
+        CommentDto comment = CommentDto
+                .builder()
+                .text("Nice one")
+                .build();
+        when(itemService.postComment(anyLong(), any(), anyLong()))
+                .thenReturn(comment);
+
+        mvc.perform(post("/items/1/comment")
+                        .content(mapper.writeValueAsString(comment))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(header, owner.getId())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(comment.getId()), Long.class))
+                .andExpect(jsonPath("$.text", is(comment.getText())));
+    }
 }

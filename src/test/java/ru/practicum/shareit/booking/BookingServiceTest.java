@@ -28,6 +28,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class BookingServiceTest {
 
+    @Autowired
+    private ItemServiceImpl itemService;
+
+    @Autowired
+    private UserServiceImpl userService;
+
+    @Autowired
+    private BookingServiceImpl bookingService;
+
     private final UserDto owner = UserDto
             .builder()
             .id(1L)
@@ -59,15 +68,6 @@ class BookingServiceTest {
     private LocalDateTime testTime;
 
     private BookingDto bookingDto;
-
-    @Autowired
-    private ItemServiceImpl itemService;
-
-    @Autowired
-    private UserServiceImpl userService;
-
-    @Autowired
-    private BookingServiceImpl bookingService;
 
     @BeforeEach
     void setBooking() {

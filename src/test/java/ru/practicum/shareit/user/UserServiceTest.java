@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @Transactional
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-public class UserServiceTest {
+class UserServiceTest {
 
     private final UserDto userDto = UserDto.builder()
             .id(1L)

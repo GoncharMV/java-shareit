@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @Transactional
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-public class ItemServiceTest {
+class ItemServiceTest {
 
     @Autowired
     private final UserService userService;

@@ -7,6 +7,9 @@ import ru.practicum.shareit.exception.CustomServerErrorException;
 
 public class PageableUtil {
 
+    private PageableUtil() {
+    }
+
     public static Pageable pageManager(int from, int size, String sort) {
         if (size < 0 || from < 0) {
             throw new CustomServerErrorException("Невалидный индекс");

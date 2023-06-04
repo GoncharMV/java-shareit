@@ -3,9 +3,12 @@ package ru.practicum.shareit.booking.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.PageableUtil;
 import ru.practicum.shareit.booking.BookingMapper;
+import ru.practicum.shareit.booking.BookingState;
 import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
@@ -106,63 +109,66 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getBookersBooking(Long bookerId, String state) {
+    public List<BookingDto> getBookersBooking(Long bookerId, BookingState state, int from, int size) {
         userRepository.findById(bookerId)
                 .orElseThrow(() -> new ObjectNotFoundException("Пользователь не найден"));
 
         List<Booking> bookings;
 
+        Pageable pageable = PageableUtil.pageManager(from, size, "start");
+
         switch (state) {
-            case "ALL":
+            case ALL:
                 return BookingMapper.toBookingDtoList(bookingRepository
-                        .findAllByBookerUserIdOrderByStartDesc(bookerId));
-            case "CURRENT":
-                bookings = bookingRepository.findByBookerCurrent(bookerId, LocalDateTime.now());
+                        .findAllByBookerUserIdOrderByStartDesc(bookerId, pageable));
+            case CURRENT:
+                bookings = bookingRepository.findByBookerCurrent(bookerId, LocalDateTime.now(), pageable);
                 return BookingMapper.toBookingDtoList(bookings);
-            case "PAST":
-                bookings = bookingRepository.findByBookerPast(bookerId, LocalDateTime.now());
+            case PAST:
+                bookings = bookingRepository.findByBookerPast(bookerId, LocalDateTime.now(), pageable);
                 return BookingMapper.toBookingDtoList(bookings);
-            case "FUTURE":
-                bookings = bookingRepository.findByBookerFuture(bookerId, LocalDateTime.now());
+            case FUTURE:
+                bookings = bookingRepository.findByBookerFuture(bookerId, LocalDateTime.now(), pageable);
                 return BookingMapper.toBookingDtoList(bookings);
-            case "WAITING":
-                bookings = bookingRepository.findByBookerAndStatus(bookerId, BookingStatus.WAITING);
+            case WAITING:
+                bookings = bookingRepository.findByBookerAndStatus(bookerId, BookingStatus.WAITING, pageable);
                 return BookingMapper.toBookingDtoList(bookings);
-            case "REJECTED":
-                bookings = bookingRepository.findByBookerAndStatus(bookerId, BookingStatus.REJECTED);
+            case REJECTED:
+                bookings = bookingRepository.findByBookerAndStatus(bookerId, BookingStatus.REJECTED, pageable);
                 return BookingMapper.toBookingDtoList(bookings);
-            default: throw new BookingException("Unknown state: " + state);
+            default: throw new BookingException("Unknown state: UNSUPPORTED_STATUS");
         }
     }
 
     @Override
-    public List<BookingDto> getOwnersBooking(Long ownerId, String state) {
-
+    public List<BookingDto> getOwnersBooking(Long ownerId, BookingState state, int from, int size) {
         userRepository.findById(ownerId)
                 .orElseThrow(() -> new ObjectNotFoundException("Пользователь не найден"));
 
         List<Booking> bookings;
 
+        Pageable pageable = PageableUtil.pageManager(from, size, "start");
+
         switch (state) {
-            case "ALL":
+            case ALL:
                 return BookingMapper.toBookingDtoList(bookingRepository
-                        .findByItemOwnerUserIdOrderByStartDesc(ownerId));
-            case "CURRENT":
-                bookings = bookingRepository.findByItemOwnerCurrent(ownerId, LocalDateTime.now());
+                        .findByItemOwnerUserIdOrderByStartDesc(ownerId, pageable));
+            case CURRENT:
+                bookings = bookingRepository.findByItemOwnerCurrent(ownerId, LocalDateTime.now(), pageable);
                 return BookingMapper.toBookingDtoList(bookings);
-            case "PAST":
-                bookings = bookingRepository.findByItemOwnerPast(ownerId, LocalDateTime.now());
+            case PAST:
+                bookings = bookingRepository.findByItemOwnerPast(ownerId, LocalDateTime.now(), pageable);
                 return BookingMapper.toBookingDtoList(bookings);
-            case "FUTURE":
-                bookings = bookingRepository.findByItemOwnerFuture(ownerId, LocalDateTime.now());
+            case FUTURE:
+                bookings = bookingRepository.findByItemOwnerFuture(ownerId, LocalDateTime.now(), pageable);
                 return BookingMapper.toBookingDtoList(bookings);
-            case "WAITING":
-                bookings = bookingRepository.findByItemOwnerAndStatus(ownerId, BookingStatus.WAITING);
+            case WAITING:
+                bookings = bookingRepository.findByItemOwnerAndStatus(ownerId, BookingStatus.WAITING, pageable);
                 return BookingMapper.toBookingDtoList(bookings);
-            case "REJECTED":
-                bookings = bookingRepository.findByItemOwnerAndStatus(ownerId, BookingStatus.REJECTED);
+            case REJECTED:
+                bookings = bookingRepository.findByItemOwnerAndStatus(ownerId, BookingStatus.REJECTED, pageable);
                 return BookingMapper.toBookingDtoList(bookings);
-            default: throw new BookingException("Unknown state: " + state);
+            default: throw new BookingException("Unknown state: UNSUPPORTED_STATUS");
         }
     }
 }

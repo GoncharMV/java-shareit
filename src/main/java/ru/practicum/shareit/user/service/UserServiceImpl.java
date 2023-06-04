@@ -11,8 +11,8 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -25,7 +25,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDto create(UserDto userDto) {
-        return UserMapper.toUserDto(userRepository.save(UserMapper.toUser(userDto)));
+        User user = userRepository.save(UserMapper.toUser(userDto));
+        return UserMapper.toUserDto(user);
     }
 
     @Override
@@ -52,16 +53,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getAll() {
-        List<User> users = userRepository.findAll();
-        List<UserDto> usersDto = new ArrayList<>();
-        for (User u : users) {
-            usersDto.add(UserMapper.toUserDto(u));
-        }
-        return usersDto;
+        return userRepository.findAll().stream().map(UserMapper::toUserDto).collect(Collectors.toList());
     }
 
     @Override
-    public User get(Long userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new ObjectNotFoundException("Пользователь не найден"));
+    public UserDto get(Long userId) {
+       User user =  userRepository.findById(userId).orElseThrow(()
+               -> new ObjectNotFoundException("Пользователь не найден"));
+
+       return UserMapper.toUserDto(user);
     }
 }

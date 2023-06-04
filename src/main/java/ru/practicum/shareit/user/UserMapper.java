@@ -9,18 +9,18 @@ public final class UserMapper {
     }
 
     public static User toUser(UserDto userDto) {
-        return new User(
-                userDto.getId(),
-                userDto.getName(),
-                userDto.getEmail()
-        );
+        return User.builder()
+                .userId(userDto.getId())
+                .name(userDto.getName())
+                .email(userDto.getEmail())
+                .build();
     }
 
     public static UserDto toUserDto(User user) {
-        return new UserDto(
-                user.getUserId(),
-                user.getName(),
-                user.getEmail()
-        );
+        return UserDto.builder()
+                .id(user.getUserId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .build();
     }
 }

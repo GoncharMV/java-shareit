@@ -137,7 +137,7 @@ class ItemServiceTest {
         itemService.addItem(item, owner.getId());
         itemService.addItem(item1, owner.getId());
 
-        Collection<ItemDto> items = itemService.getOwnerItems(owner.getId());
+        Collection<ItemDto> items = itemService.getOwnerItems(owner.getId(), 0, 10);
 
         assertEquals(2, items.size());
     }
@@ -148,7 +148,7 @@ class ItemServiceTest {
         itemService.addItem(item, owner.getId());
         itemService.addItem(item1, owner.getId());
 
-        Collection<ItemDto> items = itemService.search(item.getName());
+        Collection<ItemDto> items = itemService.search(item.getName(), 0, 10);
         assertEquals(item.getName(), items.iterator().next().getName());
         assertEquals(1, items.size());
     }
@@ -158,7 +158,7 @@ class ItemServiceTest {
         itemService.addItem(item, owner.getId());
         itemService.addItem(item1, owner.getId());
 
-        Collection<ItemDto> items = itemService.search("");
+        Collection<ItemDto> items = itemService.search("", 0, 10);
         assertEquals(0, items.size());
     }
 

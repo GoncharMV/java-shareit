@@ -76,7 +76,7 @@ class ItemControllerTest {
     @Test
     @DisplayName("Тест получения всех items пользователя")
     void getOwnerItemsTest() throws Exception {
-                when(itemService.getOwnerItems(anyLong()))
+                when(itemService.getOwnerItems(anyLong(), anyInt(), anyInt()))
                 .thenReturn(List.of(item, item2));
 
         mvc.perform(get("/items")
@@ -96,7 +96,7 @@ class ItemControllerTest {
     @Test
     @DisplayName("Тест поиска вещей")
     void searchTest() throws Exception {
-        when(itemService.search(anyString()))
+        when(itemService.search(anyString(), anyInt(), anyInt()))
                 .thenReturn(List.of(item, item2));
 
         mvc.perform(get("/items/search")

@@ -7,8 +7,6 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.model.Comment;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,12 +17,8 @@ import java.util.List;
 @Builder
 public class ItemDto {
     private Long id;
-    @NotNull(message = "Необходимо название предмета")
-    @NotEmpty(message = "Необходимо название предмета")
     private String name;
-    @NotNull(message = "Необходимо описание предмета")
     private String description;
-    @NotNull
     private Boolean available;
     private Long ownerId;
     private Long requestId;

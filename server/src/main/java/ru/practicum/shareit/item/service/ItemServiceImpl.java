@@ -3,8 +3,10 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.PageableUtil;
 import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
@@ -82,33 +84,34 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Collection<ItemDto> getOwnerItems(Long ownerId) {
-        List<Item> items = itemRepository.findAll();
+    public Collection<ItemDto> getOwnerItems(Long ownerId, int from, int size) {
+        Pageable pageable = PageableUtil.pageManager(from, size, "itemId");
+
+        List<Item> items = itemRepository.findAllByOwnerUserIdOrderByItemId(ownerId, pageable);
         Collection<ItemDto> itemsDto = new ArrayList<>();
+
 
         for (Item i : items) {
             ItemDto itemDto = ItemMapper.toItemDto(i);
+            itemDto.setLastBooking(getLastBooking(i.getItemId()));
+            itemDto.setNextBooking(getNextBooking(i.getItemId()));
 
-            User user = i.getOwner();
+            itemsDto.add(itemDto);
 
-            if (user.getUserId().equals(ownerId)) {
-                    itemDto.setLastBooking(getLastBooking(i.getItemId()));
-                    itemDto.setNextBooking(getNextBooking(i.getItemId()));
-
-                itemsDto.add(itemDto);
-            }
         }
 
         return itemsDto;
     }
 
     @Override
-    public Collection<ItemDto> search(String text) {
-        Collection<Item> items =  itemRepository.search(text);
+    public Collection<ItemDto> search(String text, int from, int size) {
+        Pageable pageable = PageableUtil.pageManager(from, size, "itemId");
+        List<Item> items =  itemRepository.search(text, pageable);
+
         if (text.isEmpty() || text.isBlank()) {
             return new ArrayList<>();
         }
-        Collection<ItemDto> itemsDto = new ArrayList<>();
+        List<ItemDto> itemsDto = new ArrayList<>();
         for (Item i : items) {
             itemsDto.add(ItemMapper.toItemDto(i));
         }

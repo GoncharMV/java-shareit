@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -31,7 +32,7 @@ class ItemRepositoryTest {
     void testItemSearch() {
         itemRepository.save(item);
 
-        Collection<Item> items = itemRepository.search("clock");
+        Collection<Item> items = itemRepository.search("clock", Pageable.ofSize(10));
         assertEquals(1, items.size());
     }
 }

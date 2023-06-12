@@ -119,6 +119,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public CommentDto postComment(Long userId, CommentDto commentDto, Long itemId) {
         commentDto.setCreated(LocalDateTime.now());
         List<Booking> bookings = bookingRepository.getAllByBookerUserIdAndItem_ItemIdAndStatusAndEndIsBefore(

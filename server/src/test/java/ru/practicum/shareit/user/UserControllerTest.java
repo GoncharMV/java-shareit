@@ -67,7 +67,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("Тест получения всех пользователей")
-    void getAllUsersTest() throws Exception {
+    void testGetAllUsers() throws Exception {
         when(userService.getAll())
                 .thenReturn(List.of(userDto, userDto2));
 
@@ -83,7 +83,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("Тест получения пользователя по ID")
-    void getUserTest() throws Exception {
+    void testGetUser() throws Exception {
         when(userService.get(anyLong()))
                 .thenReturn(userDto);
 
@@ -96,7 +96,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("Тест создания пользователя")
-    void createUserTest() throws Exception {
+    void testCreateUser() throws Exception {
         when(userService.create(any()))
                 .thenReturn(userDto);
 
@@ -113,7 +113,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("Тест редактирования пользователя")
-    void editUserTest() throws Exception {
+    void testEditUser() throws Exception {
         when(userService.edit(any(), anyLong()))
                 .thenReturn(updateUser);
 
@@ -130,7 +130,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("Тест удаления пользователя")
-    void deleteUser() throws Exception {
+    void testDeleteUser() throws Exception {
         mvc.perform(delete("/users/2"))
                 .andExpect(status().isOk());
         Mockito.verify(userService, Mockito.times(1))

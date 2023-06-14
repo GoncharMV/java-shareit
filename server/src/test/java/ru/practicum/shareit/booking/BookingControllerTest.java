@@ -77,7 +77,7 @@ class BookingControllerTest {
 
     @Test
     @DisplayName("Тест добавления бронирования")
-    void addTest() throws Exception {
+    void testAddBooking() throws Exception {
         User user = UserMapper.toUser(booker);
         Item item = ItemMapper.toItem(this.itemDto, user);
         Booking booking = BookingMapper.toBooking(bookingDto, item, user, BookingStatus.WAITING);
@@ -97,7 +97,7 @@ class BookingControllerTest {
 
     @Test
     @DisplayName("Тест изменения статуса бронирования")
-    void updateStatusTest() throws Exception {
+    void testUpdateStatus() throws Exception {
         User user = UserMapper.toUser(booker);
         Item item = ItemMapper.toItem(this.itemDto, user);
         Booking booking = BookingMapper.toBooking(bookingDto, item, user, BookingStatus.WAITING);
@@ -119,7 +119,7 @@ class BookingControllerTest {
 
     @Test
     @DisplayName("Тест получения информации по бронирования")
-    void getTest() throws Exception {
+    void testGetBooking() throws Exception {
         User user = UserMapper.toUser(booker);
         Item item = ItemMapper.toItem(this.itemDto, user);
         Booking booking = BookingMapper.toBooking(bookingDto, item, user, BookingStatus.WAITING);
@@ -135,7 +135,7 @@ class BookingControllerTest {
 
     @Test
     @DisplayName("Тест получения бронирований заказчиком")
-    void getBookersBookingTest() throws Exception {
+    void testGetBookersBooking() throws Exception {
         when(bookingService.getBookersBooking(anyLong(), any(), anyInt(), anyInt()))
                 .thenReturn(List.of(bookingDto));
 

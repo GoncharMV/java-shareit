@@ -57,21 +57,25 @@ class UserServiceTest {
 
     @Test
     @DisplayName("Тест создания пользователя")
-    void createTest() {
+    void testCreateUser() {
         userService.create(userDto3);
         List<UserDto> users = userService.getAll();
 
-        assertEquals(3, users.size());
-        assertEquals("third", users.get(2).getName());
+        assertEquals(3, users.size(),
+                "Users size expected to be 2, but was " + users.size());
+        assertEquals(userDto3.getName(), users.get(2).getName(),
+                "Name expected to be " + userDto.getName() + ", but was " + users.get(2).getName());
     }
 
     @Test
     @DisplayName("Тест редактирования пользователя")
-    void editTest() {
+    void testEditUser() {
         userService.edit(userUpdate, 1L);
 
-        assertEquals("updated", userService.get(1L).getName());
-        assertEquals("updated@mail.ru", userService.get(1L).getEmail());
+        assertEquals(userUpdate.getName(), userService.get(1L).getName(),
+                "Name expected to be " + userUpdate.getName());
+        assertEquals(userUpdate.getEmail(), userService.get(1L).getEmail(),
+                "Email expected to be " + userUpdate.getEmail());
 
         assertThrows(ObjectNotFoundException.class,
                 () -> userService.edit(userUpdate, 99L));
@@ -79,31 +83,36 @@ class UserServiceTest {
 
     @Test
     @DisplayName("Тест удаления пользователя")
-    void deleteTest() {
+    void testDeleteUser() {
         userService.delete(1L);
         List<UserDto> users = userService.getAll();
 
-        assertEquals(1, users.size());
-        assertEquals(2L, users.get(0).getId());
+        assertEquals(1, users.size(),
+                "Users size expected to be 1, but was " + users.size());
+        assertEquals(2L, users.get(0).getId(),
+                "User ID expected to be 2L, but was " + users.get(0).getId());
     }
 
     @Test
     @DisplayName("Тест получения пользователя по ID")
-    void getUserTest() {
+    void testGetUser() {
         UserDto user = userService.get(1L);
 
-        assertEquals("one", user.getName());
-        assertEquals("one@mail.ru", user.getEmail());
+        assertEquals(userDto.getName(), user.getName(),
+                "Name expected to be " + userDto.getName() + ", but was " + user.getName());
+        assertEquals(userDto.getEmail(), user.getEmail(),
+                "Email expected to be " + userDto.getEmail() + ", but was " + user.getEmail());
         assertThrows(ObjectNotFoundException.class,
                 () -> userService.get(99L));
     }
 
     @Test
     @DisplayName("Тест получения списка всех пользователей")
-    void getAllTest() {
+    void testGetUsers() {
         List<UserDto> users = userService.getAll();
 
-        assertEquals(2, users.size());
+        assertEquals(2, users.size(),
+                "Users size expected to be 2, but was " + users.size());
     }
 
 }

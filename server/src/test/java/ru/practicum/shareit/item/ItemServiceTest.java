@@ -84,10 +84,15 @@ class ItemServiceTest {
     void addItemTest() {
         ItemDto newItem = itemService.addItem(item, owner.getId());
 
-        assertEquals(item.getName(), newItem.getName());
-        assertEquals(item.getId(), newItem.getId());
-        assertEquals(item.getDescription(), newItem.getDescription());
-        assertEquals(true, newItem.getAvailable());
+        assertEquals(item.getName(), newItem.getName(),
+                "Name expected to be " + item.getName() + ", but was " + newItem.getName());
+        assertEquals(item.getId(), newItem.getId(),
+                "ID expected to be " + item.getId() + ", but was " + newItem.getId());
+        assertEquals(item.getDescription(), newItem.getDescription(),
+                "Description expected to be " + item.getDescription()
+                        + ", but was " + newItem.getDescription());
+        assertEquals(true, newItem.getAvailable(),
+                "Availability expected to be true, but was " + newItem.getAvailable());
 
     }
 
@@ -102,10 +107,15 @@ class ItemServiceTest {
     void editItemTest() {
         ItemDto newItem = itemService.editItem(itemUpdate, owner.getId(), initItem.getId());
 
-        assertEquals(initItem.getId(), newItem.getId());
-        assertEquals(itemUpdate.getName(), newItem.getName());
-        assertEquals(itemUpdate.getDescription(), newItem.getDescription());
-        assertEquals(false, newItem.getAvailable());
+        assertEquals(initItem.getId(), newItem.getId(),
+                "ID expected to be " + initItem.getId() + ", but was " + newItem.getId());
+        assertEquals(itemUpdate.getName(), newItem.getName(),
+                "Name expected to be " + itemUpdate.getName() + ", but was " + newItem.getName());
+        assertEquals(itemUpdate.getDescription(), newItem.getDescription(),
+                "Description expected to be " + itemUpdate.getDescription()
+                        + ", but was " + newItem.getDescription());
+        assertEquals(false, newItem.getAvailable(),
+                "Availability expected to be false, but was " + newItem.getAvailable());
     }
 
     @Test
@@ -120,8 +130,10 @@ class ItemServiceTest {
     void getItemTest() {
         ItemDto itemAdded = itemService.addItem(item, owner.getId());
         ItemDto itemGet = itemService.getItem(itemAdded.getId(), owner.getId());
-        assertEquals(itemAdded.getId(), itemGet.getId());
-        assertEquals(itemAdded.getName(), itemGet.getName());
+        assertEquals(itemAdded.getId(), itemGet.getId(),
+                "ID expected to be " + itemAdded.getId() + ", but was " + itemGet.getId());
+        assertEquals(itemAdded.getName(), itemGet.getName(),
+                "Name expected to be " + itemAdded.getName() + ", but was " + itemGet.getName());
     }
 
     @Test
@@ -139,12 +151,13 @@ class ItemServiceTest {
 
         Collection<ItemDto> items = itemService.getOwnerItems(owner.getId(), 0, 10);
 
-        assertEquals(2, items.size());
+        assertEquals(2, items.size(),
+                "Items size expected to be 2, but was " + items.size());
     }
 
     @Test
     @DisplayName("Тест поиска предметов")
-    void searchTest() {
+    void testSearch() {
         itemService.addItem(item, owner.getId());
         itemService.addItem(item1, owner.getId());
 
@@ -154,7 +167,7 @@ class ItemServiceTest {
     }
 
     @Test
-    void searchBlankTextTest() {
+    void testSearchBlankText() {
         itemService.addItem(item, owner.getId());
         itemService.addItem(item1, owner.getId());
 
@@ -164,7 +177,7 @@ class ItemServiceTest {
 
     @Test
     @DisplayName("Тест попытка оставить комментарий без бронирования ")
-    void postCommentWrongUserTest() {
+    void testPostCommentWrongUser() {
         ItemDto itemDto = itemService.addItem(item, owner.getId());
 
         CommentDto commentForItem = CommentDto.builder()
@@ -177,7 +190,7 @@ class ItemServiceTest {
 
     @Test
     @DisplayName("Тест пост комментария")
-    void postCommentTest() {
+    void testPostComment() {
         LocalDateTime testTime = LocalDateTime.now();
         ItemDto itemDto = itemService.addItem(item, owner.getId());
 

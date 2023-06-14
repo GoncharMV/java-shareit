@@ -5,7 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import ru.practicum.shareit.exception.CustomServerErrorException;
 
-public class PageableUtil {
+public final class PageableUtil {
 
     private PageableUtil() {
     }

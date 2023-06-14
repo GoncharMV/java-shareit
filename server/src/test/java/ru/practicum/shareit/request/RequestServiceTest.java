@@ -63,38 +63,45 @@ class RequestServiceTest {
 
     @Test
     @DisplayName("Тест создать запрос")
-    void addRequestTest() {
+    void testAddRequest() {
         ItemRequestDto newRequest = requestService.addRequest(request, requestor.getId());
-        assertEquals(request.getId(), newRequest.getId());
+        assertEquals(request.getId(), newRequest.getId(),
+                "ID expected to be " + request.getId() + ", but was " + newRequest.getId());
         assertThrows(ObjectNotFoundException.class,
                 () -> requestService.addRequest(request, 99L));
     }
 
     @Test
     @DisplayName("Тест получения всех запросов пользователя")
-    void getUsersRequestsTest() {
+    void testGetUsersRequests() {
         requestService.addRequest(request, requestor.getId());
         Collection<ItemRequestDto> requests = requestService.getUserRequests(requestor.getId());
 
-        assertEquals(request.getId(), requests.iterator().next().getId());
-        assertEquals(request.getDescription(), requests.iterator().next().getDescription());
+        assertEquals(request.getId(), requests.iterator().next().getId(),
+                "ID expected to be " + request.getId() + ", but was " + requests.iterator().next().getId());
+        assertEquals(request.getDescription(), requests.iterator().next().getDescription(),
+                "Description expected to be " + request.getDescription()
+                        + " but was " + requests.iterator().next().getDescription());
         assertThrows(ObjectNotFoundException.class,
                 () -> requestService.getUserRequests(99L));
     }
 
     @Test
     @DisplayName("Тест получения запроса по ID")
-    void getRequestByIdTest() {
+    void testGetRequestById() {
         ItemRequestDto addedRequest = requestService.addRequest(request, requestor.getId());
         ItemRequestDto newRequest = requestService.getRequestById(request.getId(), requestor.getId());
-        assertEquals(addedRequest.getId(), newRequest.getId());
-        assertEquals(addedRequest.getDescription(), newRequest.getDescription());
+        assertEquals(addedRequest.getId(), newRequest.getId(),
+                "ID expected to be " + request.getId() + ", but was " + newRequest.getId());
+        assertEquals(addedRequest.getDescription(), newRequest.getDescription(),
+                "Description expected to be " + request.getDescription()
+                        + " but was " + newRequest.getDescription());
         assertEquals(addedRequest.getCreated(), newRequest.getCreated());
     }
 
     @Test
     @DisplayName("Тест попытки получения запроса по ID")
-    void getRequestByIdWrongTest() {
+    void testGetRequestByIdWrong() {
         requestService.addRequest(request, requestor.getId());
         assertThrows(CustomServerErrorException.class,
                 () -> requestService.getRequestById(request.getId(), 99L));
@@ -106,19 +113,20 @@ class RequestServiceTest {
 
     @Test
     @DisplayName("Тест получения всех запросов")
-    void getAllRequestsTest() {
+    void testGetAllRequests() {
         requestService.addRequest(request, requestor.getId());
         requestService.addRequest(request2, user2.getId());
         Collection<ItemRequestDto> requests = requestService
                 .getAllRequests(0, 20, requestor.getId());
 
-        assertEquals(1, requests.size());
+        assertEquals(1, requests.size(),
+                "Requests size expected to be 1, but was " + requests.size());
         assertEquals(user2.getId(), requests.iterator().next().getRequestorId());
     }
 
     @Test
     @DisplayName("Тест попытка получения запросов от несуществующего пользователя")
-    void getAllRequestsWrongUserTest() {
+    void testGetAllRequestsWrongUser() {
         assertThrows(CustomServerErrorException.class,
                 () -> requestService.getAllRequests(0, 20, 99L));
     }

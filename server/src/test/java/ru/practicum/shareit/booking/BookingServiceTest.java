@@ -87,19 +87,24 @@ class BookingServiceTest {
 
     @Test
     @DisplayName("Тест добавить бронирование")
-    void addBookingTest() {
+    void testAddBooking() {
         BookingDto booking = bookingService.addBooking(bookingDto, booker.getId());
 
-        assertEquals(bookingDto.getId(), booking.getId());
-        assertEquals(bookingDto.getItemId(), booking.getItem().getId());
-        assertEquals(bookingDto.getStart(), booking.getStart());
-        assertEquals(bookingDto.getEnd(), booking.getEnd());
-        assertEquals(BookingStatus.WAITING, booking.getStatus());
+        assertEquals(bookingDto.getId(), booking.getId(),
+                 "ID expected to be " + bookingDto.getId() + ", but was " + booking.getId());
+        assertEquals(bookingDto.getItemId(), booking.getItem().getId(),
+                "Item Id expected to be " + bookingDto.getItemId() + ", but was " + booking.getItemId());
+        assertEquals(bookingDto.getStart(), booking.getStart(),
+                "Start date expected to be " + bookingDto.getStart() + ", but was " + booking.getStart());
+        assertEquals(bookingDto.getEnd(), booking.getEnd(),
+                "End date expected to be " + bookingDto.getEnd() + ", but was " + booking.getEnd());
+        assertEquals(BookingStatus.WAITING, booking.getStatus(),
+                "Booking Status expected to be " + BookingStatus.WAITING + ", but was " + booking.getStatus());
     }
 
     @Test
     @DisplayName("Тест бронирование несуществующей вещи")
-    void addBookingWrongItemTest() {
+    void testAddBookingWrongItem() {
         bookingDto.setItemId(99L);
         assertThrows(ObjectNotFoundException.class,
                 () -> bookingService.addBooking(bookingDto, booker.getId()));
@@ -107,7 +112,7 @@ class BookingServiceTest {
 
     @Test
     @DisplayName("Тест попытка бронирования своей вещи; несуществующий пользователь")
-    void addBookingWrongUserTest() {
+    void testAddBookingWrongUser() {
         assertThrows(ObjectNotFoundException.class,
                 () -> bookingService.addBooking(bookingDto, owner.getId()));
         assertThrows(ObjectNotFoundException.class,
@@ -116,7 +121,7 @@ class BookingServiceTest {
 
     @Test
     @DisplayName("Тест попытка создания бронирования с невалидной датой начала/конца")
-    void addBookingWrongDataTest() {
+    void testAddBookingWrongData() {
         bookingDto.setStart(testTime.plusSeconds(10));
         assertThrows(BookingException.class,
                 () -> bookingService.addBooking(bookingDto, booker.getId()));
@@ -127,7 +132,7 @@ class BookingServiceTest {
 
     @Test
     @DisplayName("Тест попытка забронировать недоступную вещь")
-    void addBookingUnavailable() {
+    void testAddBookingUnavailable() {
         BookingDto unavailableBooking = BookingDto.builder()
                 .id(2L)
                 .itemId(itemNotAvailable.getId())
@@ -140,23 +145,27 @@ class BookingServiceTest {
 
     @Test
     @DisplayName("Тест поменять статус бронирования APPROVED")
-    void updateStatusApprovedTest() {
+    void testUpdateStatusApproved() {
         BookingDto booking = bookingService.addBooking(bookingDto, booker.getId());
         BookingDto bookingApproved = bookingService.updateStatus(booking.getId(), owner.getId(), true);
-        assertEquals(BookingStatus.APPROVED, bookingApproved.getStatus());
+        assertEquals(BookingStatus.APPROVED, bookingApproved.getStatus(),
+                "Booking Status expected to be " + BookingStatus.APPROVED
+                        + ", but was " + bookingApproved.getStatus());
     }
 
     @Test
     @DisplayName("Тест поменять статус бронирования REJECTED")
-    void updateStatusRejectedTest() {
+    void testUpdateStatusRejected() {
         BookingDto booking = bookingService.addBooking(bookingDto, booker.getId());
         BookingDto bookingApproved = bookingService.updateStatus(booking.getId(), owner.getId(), false);
-        assertEquals(BookingStatus.REJECTED, bookingApproved.getStatus());
+        assertEquals(BookingStatus.REJECTED, bookingApproved.getStatus(),
+                "Booking Status expected to be " + BookingStatus.REJECTED
+                        + ", but was " + bookingApproved.getStatus());
     }
 
     @Test
     @DisplayName("Тест попытка изменения статуса несуществующего бронирования")
-    void updateStatusWrongBookingTest() {
+    void testUpdateStatusWrongBooking() {
         bookingService.addBooking(bookingDto, booker.getId());
         assertThrows(BookingException.class,
                 () -> bookingService.updateStatus(99L, owner.getId(), true));
@@ -164,7 +173,7 @@ class BookingServiceTest {
 
     @Test
     @DisplayName("Тест попытка изменения статуса не владельцом")
-    void updateStatusWrongUserTest() {
+    void testUpdateStatusWrongUser() {
         bookingService.addBooking(bookingDto, booker.getId());
         assertThrows(ObjectNotFoundException.class,
                 () -> bookingService.updateStatus(bookingDto.getId(), booker.getId(), true));
@@ -172,7 +181,7 @@ class BookingServiceTest {
 
     @Test
     @DisplayName("Тест получение бронирования по ID")
-    void getBookingTest() {
+    void testGetBooking() {
         BookingDto booking = bookingService.addBooking(bookingDto, booker.getId());
         BookingDto bookingGetByBooker = bookingService.getBooking(booking.getId(), booker.getId());
         BookingDto bookingGetByOwner = bookingService.getBooking(booking.getId(), owner.getId());
@@ -184,7 +193,7 @@ class BookingServiceTest {
 
     @Test
     @DisplayName("Тест попытка получения бронирования по ID невалидный пользователь")
-    void getBookingByIdWrongUser() {
+    void testGetBookingByIdWrongUser() {
         assertThrows(ObjectNotFoundException.class,
                 () -> bookingService.getBooking(bookingDto.getId(), 99L));
         assertThrows(ObjectNotFoundException.class,
@@ -203,7 +212,7 @@ class BookingServiceTest {
 
     @Test
     @DisplayName("Тест получения всех бронирований, которые совершил пользователь")
-    void getAllBookersBookingTest() {
+    void testGetAllBookersBooking() {
         BookingDto currentBooking = BookingDto.builder()
                 .id(2L)
                 .itemId(item.getId())
@@ -262,7 +271,7 @@ class BookingServiceTest {
     }
 
     @Test
-    void getBookersBookingWrongUserTest() {
+    void testGetBookersBookingWrongUser() {
         bookingService.addBooking(bookingDto, booker.getId());
         assertThrows(ObjectNotFoundException.class,
                 () -> bookingService.getBookersBooking(99L, BookingState.ALL, 0, 20));
@@ -270,7 +279,7 @@ class BookingServiceTest {
 
     @Test
     @DisplayName("Тест получения всех бронирований владельца")
-    void getAllOwnerBookingTest() {
+    void testGetAllOwnerBooking() {
         BookingDto currentBooking = BookingDto.builder()
                 .id(2L)
                 .itemId(item.getId())

@@ -61,7 +61,7 @@ class ItemControllerTest {
 
     @Test
     @DisplayName("Тест получения item по ID")
-    void getItemTest() throws Exception {
+    void testGetItem() throws Exception {
         when(itemService.getItem(anyLong(), anyLong()))
                 .thenReturn(item);
 
@@ -75,7 +75,7 @@ class ItemControllerTest {
 
     @Test
     @DisplayName("Тест получения всех items пользователя")
-    void getOwnerItemsTest() throws Exception {
+    void testGetOwnerItems() throws Exception {
                 when(itemService.getOwnerItems(anyLong(), anyInt(), anyInt()))
                 .thenReturn(List.of(item, item2));
 
@@ -95,7 +95,7 @@ class ItemControllerTest {
 
     @Test
     @DisplayName("Тест поиска вещей")
-    void searchTest() throws Exception {
+    void testSearch() throws Exception {
         when(itemService.search(anyString(), anyInt(), anyInt()))
                 .thenReturn(List.of(item, item2));
 
@@ -113,7 +113,7 @@ class ItemControllerTest {
 
     @Test
     @DisplayName("Тест добавление комментария")
-    void postCommentTest() throws Exception {
+    void testPostComment() throws Exception {
         CommentDto comment = CommentDto
                 .builder()
                 .text("Nice one")

@@ -59,7 +59,7 @@ class RequestControllerTest {
 
     @Test
     @DisplayName("Тест добавление запроса")
-    void addRequestTest() throws Exception {
+    void testAddRequest() throws Exception {
         when(requestService.addRequest(any(), anyLong()))
                 .thenReturn(requestDto);
 
@@ -77,7 +77,7 @@ class RequestControllerTest {
 
     @Test
     @DisplayName("Тест получение всех запросов пользователя")
-    void getAllByRequestorTest() throws Exception {
+    void testGetAllByRequestor() throws Exception {
         ItemRequestDto request1 = ItemRequestDto.builder()
                 .requestorId(UserMapper.toUser(requestor).getUserId())
                 .description("1")
@@ -109,7 +109,7 @@ class RequestControllerTest {
 
     @Test
     @DisplayName("Тест получения всех запросов")
-    void getAllRequestsTest() throws Exception {
+    void testGetAllRequests() throws Exception {
         ItemRequestDto request1 = ItemRequestDto.builder()
                 .requestorId(UserMapper.toUser(requestor).getUserId())
                 .description("1")
@@ -139,7 +139,7 @@ class RequestControllerTest {
 
     @Test
     @DisplayName("Тест получение запроса по ID")
-    void getByRequestIdTest() throws Exception {
+    void testGetByRequestId() throws Exception {
         when(requestService.getRequestById(anyLong(), anyLong()))
                 .thenReturn(requestDto);
 

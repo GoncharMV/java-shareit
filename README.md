@@ -14,13 +14,8 @@ and create requests if the desired item is not yet available on the platform.
 <a name="project-description"></a>
 ## Project Description
 
-Java-ShareIt is a backend API server that facilitates item sharing
-and requesting among users. It provides a platform where 
-users can add items they are willing to share and also 
-request items they need from other users. 
+Java-ShareIt is a backend API server that provides item sharing and requesting among users. 
 
-This project aims to create a collaborative environment where individuals can easily connect and exchange
-various items.
 The system is implemented as microservices - one for request validation,
 another for the rest of the business logic,
 and the database is also connected as a separate microservice

@@ -4,7 +4,11 @@ and create requests if the desired item is not yet available on the platform.
 
 ## Table of Contents
 - [Project Description](#project-description)
-- [Feature](#feature)
+- [Features](#feature)
+  - [Bookings](#bookings-bookings)
+  - [Items](#items-items)
+  - [Requests](#item-requests-requests)
+  - [Users](#users-users)
 - [Technical Stack](#technical-stack)
 
 <a name="project-description"></a>
@@ -13,8 +17,9 @@ and create requests if the desired item is not yet available on the platform.
 Java-ShareIt is a backend API server that facilitates item sharing
 and requesting among users. It provides a platform where 
 users can add items they are willing to share and also 
-request items they need from other users. This project aims to create 
-a collaborative environment where individuals can easily connect and exchange
+request items they need from other users. 
+
+This project aims to create a collaborative environment where individuals can easily connect and exchange
 various items.
 The system is implemented as microservices - one for request validation,
 another for the rest of the business logic,
@@ -203,55 +208,22 @@ and the database is also connected as a separate microservice
 
 ## Technical Stack
 
-### Spring Framework Integration: 
-The project leverages the Spring Framework, 
-a popular Java framework, to develop robust and scalable backend services.
-Spring's dependency injection, inversion of control, and powerful features 
-like Spring Boot enable efficient development and easy integration of various components.
+### Spring Framework Integration
 
-### RESTful API Development:
-With the help of Spring Web MVC, the project builds RESTful APIs 
-that follow best practices. It enables seamless communication between the frontend and backend, 
-allowing clients to interact with the application and perform CRUD (Create, Read, Update, Delete)
-operations on resources.
+### RESTful API Development
 
-### Database Integration: 
+### Database Integration
 The project utilizes Spring Data JPA, a powerful ORM (Object-Relational Mapping)
-framework, to integrate with databases. It simplifies data persistence and provides 
-efficient CRUD operations, automatic query generation, and transaction management. 
-Supported databases include popular choices like MySQL, PostgreSQL, or H2 for in-memory development 
+framework, to integrate with databases. This project uses H2 database for in-memory development 
 and testing.
 
-### Maven Build Tool: 
-Maven is used for dependency management and building the project.
-It allows for easy management of project dependencies, ensuring consistent and reliable builds.
-With Maven, developers can define project configurations, run tests, and package the application 
-for deployment with just a few commands.
+### Maven Build Tool
 
-### Containerization with Docker: 
-The project employs Docker, an open-source containerization platform, 
-to create lightweight and portable containers for the application and its dependencies. 
-Docker enables consistent deployment across different environments,
-making it easier to manage dependencies, improve scalability, and ensure application isolation.
+### Containerization with Docker
 
-### Orchestration with Docker Compose: 
-Docker Compose is utilized to define and manage 
-multi-container applications. It provides a simple and declarative way to orchestrate 
-the project's containers, allowing developers to define the services, networks, 
-and volumes required for the application to function properly. Docker Compose simplifies 
-the deployment and management of the entire application stack.
+### Orchestration with Docker Compose:
 
-### Testing and Quality Assurance: 
+### Testing and Quality Assurance
 The project utilizes Spring Testing Frameworks (JUnit, Mockito) 
-to write comprehensive unit tests and perform integration testing. 
-It promotes test-driven development (TDD) and ensures the quality and reliability of the codebase. 
-Additionally, code quality tools like SonarQube or Checkstyle can be integrated to enforce
-coding standards and maintain code consistency.
-
-
-
-License
-Specify the license under which your Java project is distributed. 
-Include any additional terms or conditions that users 
-should be aware of when using your project.
+to write comprehensive unit tests and perform integration testing.
 
